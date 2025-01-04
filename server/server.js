@@ -1,6 +1,6 @@
 const io = require('socket.io')(3000, {
   cors: {
-    origin: ['http://localhost:5174'],
+    origin: ['https://shrink-lilac.vercel.app/'],
     methods: ["GET", "POST"],
     credentials: true
   }

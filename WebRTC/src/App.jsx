@@ -11,7 +11,7 @@ const configuration = {
 function App() {
   const remoteVideoRef = useRef(null)
   const localVideoRef = useRef(null)
-  const socket = io('http://localhost:3000', {
+  const socket = io('https://video-sharing-tzao.onrender.com', {
     transports: ['websocket'],
     withCredentials: true,
     extraHeaders: {
