@@ -11,6 +11,7 @@ const configuration = {
 function App() {
   const remoteVideoRef = useRef(null)
   const localVideoRef = useRef(null)
+  const peerConnectionRef = useRef(null)
   const socket = io('https://video-sharing-tzao.onrender.com', {
     transports: ['websocket'],
     withCredentials: true,
@@ -31,8 +32,6 @@ function App() {
     audio: true
   };
 
-  let peerConnection;
-
   useEffect(() => {
     const getUserMedia = async () => {
       try {
@@ -40,15 +39,16 @@ function App() {
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream
         }
-        peerConnection = new RTCPeerConnection(configuration)
+        const pc = new RTCPeerConnection(configuration)
+        peerConnectionRef.current = pc
         let streamTracks = localStream.getTracks()
         streamTracks.forEach(track => {
-          peerConnection.addTrack(track, localStream)
+          pc.addTrack(track, localStream)
         })
-        peerConnection.onicecandidate = evt => {
+        pc.onicecandidate = evt => {
           socket.emit('send-candidate', evt.candidate ? evt.candidate : null)
         }
-        peerConnection.ontrack = evt => {
+        pc.ontrack = evt => {
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = evt.streams[0]
           }
@@ -62,24 +62,36 @@ function App() {
   }, [])
 
   const sendOffer = async () => {
-    let offer = await peerConnection.createOffer()
-    peerConnection.setLocalDescription(offer)
-    socket.emit('send-offer', offer)
+    const peerConnection = peerConnectionRef.current
+    if (peerConnection) {
+      let offer = await peerConnection.createOffer()
+      await peerConnection.setLocalDescription(offer)
+      socket.emit('send-offer', offer)
+    }
   }
 
   socket.on('recieve-offer', async (offer) => {
-    peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-    let answer = await peerConnection.createAnswer()
-    peerConnection.setLocalDescription(answer)
-    socket.emit('send-answer', answer)
+    const peerConnection = peerConnectionRef.current
+    if (peerConnection) {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+      let answer = await peerConnection.createAnswer()
+      await peerConnection.setLocalDescription(answer)
+      socket.emit('send-answer', answer)
+    }
   })
 
-  socket.on('recieve-answer', (answer) => {
-    peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+  socket.on('recieve-answer', async (answer) => {
+    const peerConnection = peerConnectionRef.current
+    if (peerConnection) {
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+    }
   })
 
-  socket.on('recieve-candidate', (candidate) => {
-    peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+  socket.on('recieve-candidate', async (candidate) => {
+    const peerConnection = peerConnectionRef.current
+    if (peerConnection && candidate) {
+      await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+    }
   })
 
   return (
