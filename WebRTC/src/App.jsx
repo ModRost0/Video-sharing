@@ -79,10 +79,11 @@ function App() {
 return (
   <>
     <button onClick={sendOffer} className="responsive-button">Start</button>
-    <video className="responsive-video" autoPlay muted ref={localVideoRef}></video>
-    <video className="responsive-video" autoPlay ref={remoteVideoRef}></video>
+    <video className="responsive-video local" autoPlay muted ref={localVideoRef}></video>
+    <video className="responsive-video remote" autoPlay ref={remoteVideoRef}></video>
   </>
 );
+
 
 }
 
