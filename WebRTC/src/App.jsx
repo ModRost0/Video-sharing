@@ -76,13 +76,14 @@ function App() {
     peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
   })
 
-  return (
-    <>
-      <button onClick={sendOffer}>Start</button>
-      <video width={600} autoPlay muted ref={localVideoRef}></video>
-      <video width={600} autoPlay ref={remoteVideoRef}></video>
-    </>
-  )
+return (
+  <>
+    <button onClick={sendOffer} className="responsive-button">Start</button>
+    <video className="responsive-video" autoPlay muted ref={localVideoRef}></video>
+    <video className="responsive-video" autoPlay ref={remoteVideoRef}></video>
+  </>
+);
+
 }
 
 export default App
