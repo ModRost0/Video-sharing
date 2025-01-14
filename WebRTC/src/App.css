@@ -19,6 +19,10 @@
   border-radius: 8px;
 }
 
+.remote {
+  max-width: 400px; /* Set a smaller max-width for the remote video */
+}
+
 @media (max-width: 768px) {
   .responsive-video {
     max-width: 100%;
@@ -28,7 +32,18 @@
     font-size: 0.9rem;
     padding: 8px 16px;
   }
+
+  .remote {
+    max-width: 100%; /* Remote video adjusts to full width on mobile */
+  }
 }
+
+@media (min-width: 1200px) {
+  .remote {
+    max-width: 300px; /* Limit remote video size further on larger screens */
+  }
+}
+
 
 .logo {
   height: 6em;
